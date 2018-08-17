@@ -54,6 +54,7 @@ Because this is intended to be used with FileMaker layouts, the table name is re
             "field": "ClientPO",
             "type": "Text"
         }
+    ]
 }
 ```
 
@@ -65,7 +66,6 @@ Because this is intended to be used with FileMaker layouts, the table name is re
 
 See this [blog post](https://msdev.co.uk/fm-layout-to-entity) for more details.
 
-Steve Winter
-Matatiro Solutions
-hello@msdev.co.uk
-@steveWinterNZ
+Steve Winter  
+Matatiro Solutions  
+steve@msdev.co.uk
