@@ -8,14 +8,17 @@
 
 namespace Console;
 
+
+use DateTime;
+
 class Components
 {
-    static public function header(string $entity, string $layout, bool $repo)
+    public static function header(string $entity, string $layout, bool $repo): string
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $date = $now->format('d/m/Y');
         $time = $now->format('H:i');
-        $repo = $repo ? sprintf('@ORM\Entity(repositoryClass="App\Repository\%sRepository")', $entity) : '';
+        $repoString = $repo ? sprintf('@ORM\Entity(repositoryClass="App\Repository\%sRepository")', $entity) : '';
 
         return <<<EOPHP
 <?php
@@ -33,7 +36,7 @@ use Doctrine\ORM\Mapping as ORM;
  * {$entity}
  *
  * @ORM\Table(name="{$layout}")
- * {$repo}
+ * {$repoString}
  */
 class {$entity}
 {
@@ -47,11 +50,11 @@ class {$entity}
 EOPHP;
 
     }
-//text, number, date, time, timestamp, or container
-    public static function Text($field) {
-        $col = strstr($field, '::') ? "'{$field}'" : $field;
-        $param = lcfirst($field);
 
+    public static function Text($field): string
+    {
+        $col = self::getColName($field);
+        $param = self::getParamName($field);
         return <<<EOPHP
 
     /**
@@ -64,9 +67,10 @@ EOPHP;
 EOPHP;
     }
 
-    public static function Number($field) {
-        $col = strstr($field, '::') ? "'{$field}'" : $field;
-        $param = lcfirst($field);
+    public static function Number($field): string
+    {
+        $col = self::getColName($field);
+        $param = self::getParamName($field);
 
         return <<<EOPHP
 
@@ -80,9 +84,10 @@ EOPHP;
 EOPHP;
     }
 
-    public static function Date($field) {
-        $col = strstr($field, '::') ? "'{$field}'" : $field;
-        $param = lcfirst($field);
+    public static function Date($field): string
+    {
+        $col = self::getColName($field);
+        $param = self::getParamName($field);
 
         return <<<EOPHP
 
@@ -96,9 +101,10 @@ EOPHP;
 EOPHP;
     }
 
-    public static function Time($field) {
-        $col = strstr($field, '::') ? "'{$field}'" : $field;
-        $param = lcfirst($field);
+    public static function Time($field): string
+    {
+        $col = self::getColName($field);
+        $param = self::getParamName($field);
 
         return <<<EOPHP
 
@@ -112,9 +118,10 @@ EOPHP;
 EOPHP;
     }
 
-    public static function Timestamp($field) {
-        $col = strstr($field, '::') ? "'{$field}'" : $field;
-        $param = lcfirst($field);
+    public static function Timestamp($field): string
+    {
+        $col = self::getColName($field);
+        $param = self::getParamName($field);
 
         return <<<EOPHP
 
@@ -128,9 +135,10 @@ EOPHP;
 EOPHP;
     }
 
-    public static function Container($field) {
-        $col = strstr($field, '::') ? "'{$field}'" : $field;
-        $param = lcfirst($field);
+    public static function Container($field): string
+    {
+        $col = self::getColName($field);
+        $param = self::getParamName($field);
 
         return <<<EOPHP
 
@@ -144,7 +152,7 @@ EOPHP;
 EOPHP;
     }
 
-    public static function footer()
+    public static function footer(): string
     {
         return <<<EOPHP
 
@@ -153,9 +161,21 @@ EOPHP;
 
     }
 
-    public static function repo($entity)
+    private static function getColName($field): string
     {
-        $now = new \DateTime();
+        return strpos($field, '::') !== false ? "'{$field}'" : $field;
+    }
+
+    private static function getParamName($field): string
+    {
+        return lcfirst(
+            str_replace(['::', '.', '_', ' '], '', $field)
+        );
+    }
+
+    public static function repo($entity): string
+    {
+        $now = new DateTime();
         $date = $now->format('d/m/Y');
         $time = $now->format('H:i');
 
@@ -169,7 +189,7 @@ EOPHP;
  
 namespace App\Repository;
 
-use App\Entity\{$entity};
+use App\Entity\\{$entity};
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 
