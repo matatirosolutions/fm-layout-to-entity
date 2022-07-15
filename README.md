@@ -25,6 +25,7 @@ Arguments:
 
 Options:
   -r, --repo[=REPO]     Should a repository also be generated. [default: false]
+  -a, --attributes      Use PHP 8+ attributes, rather than comment-based annotations
   -h, --help            Display this help message
   -q, --quiet           Do not output any message
   -V, --version         Display this application version
@@ -36,7 +37,7 @@ Options:
 For example
 
 ```bash
-    bin/console convert ./fields.json ../MySymfonyProject/src Order -r=true
+    bin/console convert ./fields.json ../MySymfonyProject/src Order -r=true -a=false
 ```
 ## JSON structure ##
 

@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Console\Components;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class LayoutToEntity extends SymfonyCommand
@@ -25,18 +24,20 @@ class LayoutToEntity extends SymfonyCommand
             -> addArgument('file', InputArgument::REQUIRED, 'Path to the json file exported from FileMaker.')
             -> addArgument('destination', InputArgument::REQUIRED, 'Location to save the entity. If you also generate a repo, then they will be put in appropriate sub folders of the location given.')
             -> addArgument('entity', InputArgument::REQUIRED, 'The name of the entity to generate.')
-            -> addOption('repo', 'r', InputOption::VALUE_OPTIONAL, 'Should a repository also be generated.', false);
+            -> addOption('repo', 'r', InputOption::VALUE_OPTIONAL, 'Should a repository also be generated.', false)
+            -> addOption('attributes', 'a', InputOption::VALUE_OPTIONAL, 'Use PHP 8 attributes rather than comment-based annotations.', false);
     }
     public function execute(InputInterface $input, OutputInterface $output)
     {
-
         $json = $this->loadFieldsFromFile($input->getArgument('file'), $output);
         $content = $this->generateHeader($input, $json->layout);
+        $generator = $input->getOption('attributes') ? ComponentsAttributes::class : Components::class;
 
         foreach($json->fields as $field) {
-            $content .= Components::{$field->type}($field->field);
+            $id = isset($field->id) && $field->id;
+            $content .= $generator::{$field->type}($field->field, $id);
         }
-        $content .= Components::footer();
+        $content .= $generator::footer();
 
         $this->writeToFile($input, $output, $content);
         $output->writeln('<info>Entity generated</info>');
@@ -64,8 +65,9 @@ class LayoutToEntity extends SymfonyCommand
     private function generateHeader(InputInterface $input, $layout)
     {
         $entity = $input->getArgument('entity');
+        $generator = $input->getOption('attributes') ? ComponentsAttributes::class : Components::class;
 
-        return Components::header($entity, $layout, $input->getOption('repo'));
+        return $generator::header($entity, $layout, $input->getOption('repo'));
     }
 
 
