@@ -1,6 +1,7 @@
 {
     "require": {
         "php": "7.2",
+        "ext-json": "*",
         "symfony/console": "^4.1"
     },
     "autoload": {

@@ -57,9 +57,7 @@ class LayoutToEntity extends SymfonyCommand
             exit();
         }
 
-        return json_decode(
-            file_get_contents($file)
-        );
+        return json_decode(file_get_contents($file), false);
     }
 
     private function generateHeader(InputInterface $input, $layout)
