@@ -148,13 +148,17 @@ EOPHP;
 
     public static function repo($entity): string
     {
+        $entityPath = explode('/', $entity);
+        $entity = array_pop($entityPath);
+        $folder = count($entityPath) ? '\\' . implode('\\', $entityPath) : '';
+
         return <<<EOPHP
 <?php
 declare(strict_types=1);
  
-namespace App\Repository;
+namespace App\Repository{$folder};
 
-use App\Entity\\{$entity};
+use App\Entity{$folder}\\{$entity};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

@@ -8,19 +8,23 @@ class ComponentsAttributes
 {
     public static function header(string $entity, string $layout, bool $repo): string
     {
-        $repoUse = $repo  ? sprintf("use App\Repository\%sRepository;\n", $entity) : '';
+        $entityPath = explode('/', $entity);
+        $entity = array_pop($entityPath);
+        $folder = count($entityPath) ? '\\' . implode('\\', $entityPath) : '';
+
+        $repoUse = $repo  ? sprintf("use App\Repository%s\%sRepository;\n", $folder, $entity) : '';
         $repoString = $repo ? sprintf("#[ORM\Entity(repositoryClass: %sRepository::class)]\n", $entity) : '';
 
         return <<<EOPHP
 <?php
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Entity{$folder};
 
 {$repoUse}use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: '$entity')]
+#[ORM\Table(name: '$layout')]
 {$repoString}class $entity
 {
     #[ORM\Column(name: 'rec_id', type: 'integer')]
@@ -38,7 +42,7 @@ EOPHP;
 
         return <<<EOPHP
 
-    $idString#[ORM\Column(name: '$col', type: 'string', length: 255)]
+    $idString#[ORM\Column(name: "$col", type: 'string', length: 255)]
     private string \${$param};
     
 EOPHP;
@@ -136,13 +140,17 @@ EOPHP;
 
     public static function repo($entity): string
     {
+        $entityPath = explode('/', $entity);
+        $entity = array_pop($entityPath);
+        $folder = count($entityPath) ? '\\' . implode('\\', $entityPath) : '';
+
         return <<<EOPHP
 <?php
 declare(strict_types=1);
  
-namespace App\Repository;
+namespace App\Repository{$folder};
 
-use App\Entity\\{$entity};
+use App\Entity{$folder}\\{$entity};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
