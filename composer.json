@@ -1,8 +1,8 @@
 {
     "require": {
-        "php": "7.2",
+        "php": "7.2 || 8.*",
         "ext-json": "*",
-        "symfony/console": "^4.1"
+        "symfony/console": "^4.4 || ^5.4 || ^6.1"
     },
     "autoload": {
         "psr-4": {

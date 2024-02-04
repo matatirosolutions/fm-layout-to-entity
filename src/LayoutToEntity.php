@@ -1,13 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: stevewinter
- * Date: 17/08/2018
- * Time: 15:17
- */
 
 namespace Console;
 
+use stdClass;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,7 +22,7 @@ class LayoutToEntity extends SymfonyCommand
             -> addOption('repo', 'r', InputOption::VALUE_OPTIONAL, 'Should a repository also be generated.', false)
             -> addOption('attributes', 'a', InputOption::VALUE_OPTIONAL, 'Use PHP 8 attributes rather than comment-based annotations.', false);
     }
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $json = $this->loadFieldsFromFile($input->getArgument('file'), $output);
         $content = $this->generateHeader($input, $json->layout);
@@ -41,6 +36,8 @@ class LayoutToEntity extends SymfonyCommand
 
         $this->writeToFile($input, $output, $content);
         $output->writeln('<info>Entity generated</info>');
+
+        return self::SUCCESS;
     }
 
 
@@ -48,9 +45,9 @@ class LayoutToEntity extends SymfonyCommand
      * @param $file
      * @param OutputInterface $output
      *
-     * @return object
+     * @return StdClass
      */
-    private function loadFieldsFromFile($file, OutputInterface $output)
+    private function loadFieldsFromFile($file, OutputInterface $output): StdClass
     {
         if(!file_exists($file)) {
             $output->writeln('<error>Unable to find file. Please check the path is correct</error>');
@@ -60,7 +57,7 @@ class LayoutToEntity extends SymfonyCommand
         return json_decode(file_get_contents($file), false);
     }
 
-    private function generateHeader(InputInterface $input, $layout)
+    private function generateHeader(InputInterface $input, $layout): string
     {
         $entity = $input->getArgument('entity');
         $generator = $input->getOption('attributes') ? ComponentsAttributes::class : Components::class;
@@ -69,7 +66,7 @@ class LayoutToEntity extends SymfonyCommand
     }
 
 
-    private function writeToFile(InputInterface $input, OutputInterface $output, string $content)
+    private function writeToFile(InputInterface $input, OutputInterface $output, string $content): void
     {
         $entity = $input->getArgument('entity');
         $path = $this->entityDestination($input);
@@ -98,8 +95,7 @@ class LayoutToEntity extends SymfonyCommand
         }
     }
 
-
-    private function entityDestination(InputInterface $input)
+    private function entityDestination(InputInterface $input): string
     {
         $base = $this->basePath($input);
         if($input->getOption('repo')) {
@@ -109,16 +105,16 @@ class LayoutToEntity extends SymfonyCommand
         return $base;
     }
 
-    private function repoDestination(InputInterface $input)
+    private function repoDestination(InputInterface $input): string
     {
         return $this->basePath($input) . 'Repository' . DIRECTORY_SEPARATOR .
             $input->getArgument('entity') . 'Repository.php';
     }
 
-    private function basePath(InputInterface $input)
+    private function basePath(InputInterface $input): string
     {
         $base = $input->getArgument('destination');
-        if(DIRECTORY_SEPARATOR != substr($base, -1)) {
+        if(DIRECTORY_SEPARATOR !== substr($base, -1)) {
             $base .= DIRECTORY_SEPARATOR;
         }
 
